@@ -14,38 +14,54 @@
 
 import streamlit as st
 from streamlit.logger import get_logger
+import pickle
+import numpy as np
+ # Load the Random Forest Classifier model
 
-LOGGER = get_logger(__name__)
+filename = 'diabetes-prediction-rfc-model.pkl'
 
+classifier = pickle.load(open(filename, 'rb'))
+ 
+def predict(pregnancies, glucose, bloodpressure, skinthickness, insulin, bmi, dpf, age):
 
-def run():
-    st.set_page_config(
-        page_title="Hello",
-        page_icon="👋",
-    )
+    data = np.array([[pregnancies, glucose, bloodpressure, skinthickness, insulin, bmi, dpf, age]])
 
-    st.write("# Welcome to Streamlit! 👋")
+    prediction = classifier.predict(data)
 
-    st.sidebar.success("Select a demo above.")
+    return prediction
+ 
+def main():
 
-    st.markdown(
-        """
-        Streamlit is an open-source app framework built specifically for
-        Machine Learning and Data Science projects.
-        **👈 Select a demo from the sidebar** to see some examples
-        of what Streamlit can do!
-        ### Want to learn more?
-        - Check out [streamlit.io](https://streamlit.io)
-        - Jump into our [documentation](https://docs.streamlit.io)
-        - Ask a question in our [community
-          forums](https://discuss.streamlit.io)
-        ### See more complex demos
-        - Use a neural net to [analyze the Udacity Self-driving Car Image
-          Dataset](https://github.com/streamlit/demo-self-driving)
-        - Explore a [New York City rideshare dataset](https://github.com/streamlit/demo-uber-nyc-pickups)
-    """
-    )
+    st.title('Diabetes Prediction')
+ 
+    pregnancies = st.slider('Pregnancies', 0, 20, 1)
 
+    glucose = st.slider('Glucose', 0, 200, 100)
 
-if __name__ == "__main__":
-    run()
+    bloodpressure = st.slider('Blood Pressure', 0, 150, 70)
+
+    skinthickness = st.slider('Skin Thickness', 0, 100, 20)
+
+    insulin = st.slider('Insulin', 0, 900, 100)
+
+    bmi = st.slider('BMI', 0.0, 70.0, 25.0)
+
+    dpf = st.slider('Diabetes Pedigree Function', 0.0, 3.0, 1.0)
+
+    age = st.slider('Age', 0, 100, 30)
+ 
+    if st.button('Predict'):
+
+        prediction = predict(pregnancies, glucose, bloodpressure, skinthickness, insulin, bmi, dpf, age)
+
+        if prediction == 1:
+
+            st.write('The person is likely to have diabetes.')
+
+        else:
+
+            st.write("The person is unlikely to have diabetes.")
+ 
+if __name__ == '__main__':
+
+    main()
